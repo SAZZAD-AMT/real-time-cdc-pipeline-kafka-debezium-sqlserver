@@ -5,3 +5,5 @@ This project provides a **real-time data replication pipeline** between SQL Serv
 
 ![Docker Run](Images/kafka_ui_in_docker.png)
 ![kafka connect](Images/kafka_connector_running.png)
+![load data to target](Images/load_data_target_table.png)
+
