@@ -1,0 +1,58 @@
+
+-- POST http://localhost:8083/connectors
+{
+  "name": "sql-server-cdc-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.sqlserver.SqlServerConnector",
+    "database.hostname": "192.168.18.117",
+    "database.port": "1433",
+    "database.user": "testuser",
+    "database.password": "StrongPassword123!",
+    "database.dbname": "cdc_test",
+    "database.server.name": "testuser",
+    "table.include.list": "dbo.employee",
+    "database.history.kafka.bootstrap.servers": "kafka:29092",
+    "database.history.kafka.topic": "dbhistory.sql-server-cdc",
+    "database.history.kafka.recovery.poll.interval.ms": "5000",
+    "database.history.kafka.recovery.attempts": "4",
+    "tasks.max": "1",
+    "database.encrypt": "true",
+    "database.trustServerCertificate": "true",
+    "database.applicationName": "Debezium",
+    "snapshot.mode": "initial",
+    "topic.creation.default.replication.factor": 1,
+    "topic.creation.default.partitions": 1,
+    "topic.creation.enable": true,
+    "key.columns": "dbo.employee:id",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false"
+  }
+}
+
+
+
+-- second POST http://localhost:8083/connectors
+{
+  "name": "sqlserver-sink",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+    "tasks.max": "1",
+    "topics": "testuser.dbo.employee",
+    "connection.url": "jdbc:sqlserver://192.168.18.117:1433;databaseName=cdc_test;encrypt=true;trustServerCertificate=true",
+    "connection.user": "testuser",
+    "connection.password": "StrongPassword123!",
+    "auto.create": "true",
+    "auto.evolve": "true",
+    "insert.mode": "upsert",
+    "pk.mode": "record_value",
+    "pk.fields": "id",
+    "table.name.format": "employee_target",
+    "delete.enabled": "false",
+    "transforms": "unwrap",
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.unwrap.drop.tombstones": "true",
+    "transforms.unwrap.delete.handling.mode": "rewrite"
+  }
+}
